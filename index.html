@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayEasy - Đặt Phòng Khách Sạn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Nhúng thêm Bootstrap Icons để hiển thị icon điện thoại, email, địa chỉ mượt mà -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100"> <!-- Thêm thuộc tính d-flex để đẩy footer xuống đáy nếu ít phòng -->
+
+<header class="py-4 text-center bg-white shadow-sm sticky-top">
+    <h1 class="m-0 text-primary fw-bold">StayEasy</h1>
+</header>
+
+<div class="container my-4 flex-grow-1"> <!-- Thêm flex-grow-1 để căn đều bố cục trang -->
+    <div class="row g-2 justify-content-center mb-4">
+        <div class="col-md-4 col-8">
+            <select id="typeFilter" class="form-select">
+                <option value="">Tất cả danh mục phòng</option>
+                <option value="Standard">Standard</option>
+                <option value="Deluxe">Deluxe</option>
+                <option value="Family">Family</option>
+            </select>
+        </div>
+        <div class="col-md-2 col-4">
+            <button class="btn btn-primary w-100" onclick="filterRooms()">Lọc phòng</button>
+        </div>
+    </div>
+    <div id="roomContainer" class="row row-cols-1 row-cols-md-3 g-4 justify-content-center"></div>
+</div>
+
+<div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary fw-bold" id="roomName"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="roomImageContainer" class="mb-3"></div>
+                <p id="roomType" class="mb-2"></p>
+                <p id="roomPrice" class="text-danger fw-bold m-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="showBookingForm()">Đặt phòng ngay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div id="bookingForm" class="booking-form container my-5 p-4 bg-white rounded shadow-sm border" style="display: none; max-width: 500px;">
+        <h2 class="text-center text-primary mb-4 fw-bold">Đặt phòng</h2>
+        <form id="formDatPhong" novalidate autocomplete="off">
+            <!-- Ô Nhập Tên -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Họ và tên khách hàng:</label>
+                <input type="text" id="customerName" class="form-control" placeholder="Nhập tên của bạn...">
+                <div id="customerNameError" class="text-danger small mt-1 fw-bold"></div>
+            </div>
+            
+            <!-- Ô Nhập SĐT & Giới Tính -->
+            <div class="row g-2 mb-3">
+                <div class="col-md-7">
+                    <label class="form-label fw-semibold">Số điện thoại:</label>
+                    <input type="tel" id="customerPhone" class="form-control" placeholder="Ví dụ: 0912345678" maxlength="10">
+                    <div id="customerPhoneError" class="text-danger small mt-1 fw-bold"></div>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold">Giới tính:</label>
+                    <select id="customerGender" class="form-select">
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Ô Chọn Ngày -->
+            <div class="row g-2 mb-3">
+                <div class="col">
+                    <label class="form-label fw-semibold">Ngày nhận phòng:</label>
+                    <input type="date" id="checkIn" class="form-control">
+                </div>
+                <div class="col">
+                    <label class="form-label fw-semibold">Ngày trả phòng:</label>
+                    <input type="date" id="checkOut" class="form-control">
+                </div>
+            </div>
+            <div id="dateError" class="text-danger small mb-3 fw-bold"></div>
+            
+            <div id="bookingInfo" class="alert alert-info py-2 px-3 style-info-box" style="display:none;"></div>
+
+            <div class="d-flex gap-2 justify-content-end mt-4">
+                <button type="button" class="btn btn-outline-secondary" onclick="$('#bookingForm').slideUp();">Hủy bỏ</button>
+                <button type="submit" class="btn btn-success px-4">Xác nhận đặt</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== PHẦN CHÂN TRANG (FOOTER) BỔ SUNG ==================== -->
+<footer class="bg-dark text-white pt-5 pb-3 mt-auto">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Cột 1: Giới thiệu ngắn -->
+            <div class="col-md-5">
+                <h5 class="text-primary fw-bold mb-3">StayEasy Booking</h5>
+                <p class="text-secondary small" style="line-height: 1.6;">
+                    Hệ thống đặt phòng trực tuyến nhanh chóng, tin cậy và tiện lợi. Mang lại trải nghiệm nghỉ dưỡng tuyệt vời nhất cho kỳ nghỉ của bạn.
+                </p>
+            </div>
+            
+            <!-- Cột 2: Thông tin liên hệ đầy đủ -->
+            <div class="col-md-7 text-md-end text-start">
+                <h5 class="text-white fw-bold mb-3">Thông Tin Liên Hệ</h5>
+                <ul class="list-unstyled text-secondary small mb-0">
+                    <li class="mb-2">
+                        <i class="bi bi-telephone-fill text-primary me-2"></i> HotLine: <b>0912 345 678</b>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-envelope-fill text-primary me-2"></i> Email: <a href="mailto:support@stayeasy.com" class="text-secondary text-decoration-none">support@stayeasy.com</a>
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-geo-alt-fill text-primary me-2"></i> Địa chỉ: 123 Đường Cầu Giấy, Quận Cầu Giấy, Hà Nội
+                    </li>
+                    <li>
+                        <i class="bi bi-clock-fill text-primary me-2"></i> Thời gian làm việc: 24/7 (Cả ngày lễ)
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <hr class="border-secondary my-4">
+        
+        <!-- Dòng bản quyền dưới cùng -->
+        <div class="row">
+            <div class="col text-center text-secondary small">
+                <p class="mb-0">&copy; 2026 StayEasy. Tất cả quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- ========================================================================= -->
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="rooms.js"></script>
+<script src="booking.js"></script>
+</body>
+</html>

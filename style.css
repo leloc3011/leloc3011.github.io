@@ -1,0 +1,40 @@
+header 
+{
+    z-index: 1020;
+    transition: all 0.3s ease-in-out;
+}
+.room-card 
+{
+    transition: all 0.25s ease-in-out;
+}
+.room-card:hover 
+{
+    border-color: #003580 !important;
+}
+.style-booking-card 
+{
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    background-color: #ffffff;
+}
+.style-info-box 
+{
+    background-color: #e8f4fd;
+    border-left: 4px solid #006ce4;
+    color: #003580;
+}
+
+.style-info-box p 
+{
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+.style-info-box p:last-child 
+{
+    margin-bottom: 0;
+}
+.text-danger.small 
+{
+    font-size: 0.85rem;
+    min-height: 18px;
+}
